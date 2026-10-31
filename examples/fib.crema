@@ -1,0 +1,22 @@
+# フィボナッチ数: 素朴な再帰・末尾再帰・辞書によるメモ化
+
+: fib ( n -- f )
+  dup 2 < [ ] [ dup 1 - fib swap 2 - fib + ] if ;
+
+# 末尾再帰版。末尾呼び出しは最適化されるので深くてもスタックを消費しない
+: fib-iter ( a b n -- f )
+  dup 0 = [ drop drop ] [ 1 - -rot tuck + rot fib-iter ] if ;
+: fast-fib ( n -- f ) 0 1 rot fib-iter ;
+
+# メモ化版
+dict -> memo
+: memo-fib ( n -- f )
+  -> n
+  n 2 < [ n return ] when
+  memo n contains? [ memo n at return ] when
+  n 1 - memo-fib n 2 - memo-fib +
+  dup memo n rot put drop ;
+
+"fib(20)       = " 20 fib str + print
+"fast-fib(100) = " 100 fast-fib str + print
+"memo-fib(90)  = " 90 memo-fib str + print

@@ -1,0 +1,19 @@
+# エラトステネスのふるい: while ループとリストの書き換え
+
+: sieve ( n -- primes )
+  -> n
+  { } -> flags
+  n 1 + [ flags true append drop ] times
+  flags 0 false put 1 false put drop
+  2 -> i
+  [ i i * n <= ] [
+    flags i at [
+      i i * -> j
+      [ j n <= ] [ flags j false put drop  j i + -> j ] while
+    ] when
+    i 1 + -> i
+  ] while
+  0 n range [ flags swap at ] filter ;
+
+100 sieve dup print
+"count: " swap len str + print

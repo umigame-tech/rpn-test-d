@@ -1,0 +1,7 @@
+# 再帰で階乗を計算する。整数は任意精度。
+
+: fact ( n -- n! )
+  dup 1 <= [ drop 1 ] [ dup 1 - fact * ] if ;
+
+1 10 [ -> n  "{}! = {}" { n n fact } format print ] for
+"30! = " 30 fact str + print

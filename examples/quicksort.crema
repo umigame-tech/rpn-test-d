@@ -1,0 +1,17 @@
+# クイックソート: 再帰・リスト・高階関数・クロージャ
+
+: quicksort ( list -- sorted )
+  dup len 1 <= [ return ] when
+  dup first -> pivot
+  rest -> xs
+  xs [ pivot < ] filter quicksort
+  { pivot } +
+  xs [ pivot >= ] filter quicksort + ;
+
+{ 38 27 43 3 9 82 10 3 55 1 } dup "input:  " write print
+quicksort "sorted: " write print
+
+{ "pear" "apple" "fig" "banana" } quicksort print
+
+# 組み込みの sort-by でキーを指定して並べ替える
+{ "pear" "apple" "fig" "banana" } [ len ] sort-by print
