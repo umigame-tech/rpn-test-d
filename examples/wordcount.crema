@@ -1,0 +1,21 @@
+# 単語の出現回数を数える。
+#   crema examples/wordcount.crema FILE
+# FILE を省略した場合は標準入力から読む。
+
+: read-input ( -- text )
+  args empty? [ read-all ] [ args first read-file ] if ;
+
+: count-words ( text -- dict )
+  dict -> counts
+  lower "" split [
+    -> w
+    counts w  counts w 0 get 1 +  put drop
+  ] each
+  counts ;
+
+: second-desc ( pair -- key ) 1 at neg ;
+
+read-input count-words pairs
+[ second-desc ] sort-by
+dup len 10 min 0 swap slice
+[ unpack -> { w n }  n 5 pad-left "  " + w + print ] each

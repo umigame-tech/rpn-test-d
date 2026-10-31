@@ -1,0 +1,19 @@
+# エラー処理: try / error / assert
+
+: safe-div ( a b -- q )
+  dup 0 = [ "division by zero is not allowed" error ] when / ;
+
+[ 10 2 safe-div print ] [ "error: " swap + print ] try
+[ 10 0 safe-div print ] [ "error: " swap + print ] try
+
+# 組み込みワードのエラーも捕まえられる
+[ { 1 2 3 } 10 at ] [ "caught: " swap + print ] try
+[ "no-such-file.txt" read-file ] [ "caught: " swap + print ] try
+
+# 数値に変換できなければ nil を返す
+: parse-or-nil ( str -- n|nil ) [ num ] [ drop nil ] try ;
+"42" parse-or-nil print
+"abc" parse-or-nil print
+
+1 1 + 2 = "arithmetic works" assert
+"all assertions passed" print

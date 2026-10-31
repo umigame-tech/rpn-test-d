@@ -1,0 +1,11 @@
+# ハノイの塔: 多引数の再帰
+
+: hanoi ( n from to via -- )
+  -> { n from to via }
+  n 0 > [
+    n 1 - from via to hanoi
+    "move disk {} : {} -> {}" { n from to } format print
+    n 1 - via to from hanoi
+  ] when ;
+
+3 "A" "C" "B" hanoi

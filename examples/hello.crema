@@ -1,0 +1,6 @@
+#!/usr/bin/env crema
+# はじめての Crema プログラム
+"Hello, World!" print
+
+# 逆ポーランド記法: (1 + 2) * 3
+1 2 + 3 * print

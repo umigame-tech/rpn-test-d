@@ -1,0 +1,47 @@
+# Crema で書いた RPN 電卓。1 行に 1 つの式を読み、評価結果を表示する。
+#   echo "3 4 + 2 *" | crema examples/calc.crema
+# Crema の eval は使わず、字句解析と評価を自前で行う。
+# 電卓のスタックは Crema のリストで表し、各演算は ( stack -- stack ) のクォート。
+
+: need ( stack n -- stack )
+  over len swap < [ "stack underflow" error ] when ;
+
+: unop ( stack [f] -- stack )
+  -> f  1 need  pop f call append ;
+
+: binop ( stack [f] -- stack )
+  -> f  2 need  pop -> b  pop -> a  a b f call append ;
+
+dict
+  "+"    [ [ + ] binop ] put
+  "-"    [ [ - ] binop ] put
+  "*"    [ [ * ] binop ] put
+  "/"    [ [ / ] binop ] put
+  "^"    [ [ pow ] binop ] put
+  "neg"  [ [ neg ] unop ] put
+  "sqrt" [ [ sqrt ] unop ] put
+  "dup"  [ 1 need  dup last append ] put
+  "swap" [ 2 need  pop -> b  pop -> a  b append a append ] put
+-> ops
+
+: eval-token ( stack token -- stack )
+  -> tok
+  ops tok contains? [
+    ops tok at call
+  ] [
+    [ tok num ] [ drop "unknown token '" tok + "'" + error ] try
+    append
+  ] if ;
+
+: eval-line ( line -- result )
+  "" split { } [ eval-token ] fold
+  dup len 1 != [ "expected exactly one result, got " swap len str + error ] when
+  first ;
+
+[ read-line dup nil? not ] [
+  -> line
+  line trim empty? [
+    [ line eval-line "= " swap str + print ]
+    [ "error: " swap + print ] try
+  ] unless
+] while drop

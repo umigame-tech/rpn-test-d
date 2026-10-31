@@ -1,0 +1,47 @@
+# Crema で書いた Brainfuck インタプリタ。
+#   crema examples/brainfuck.crema            組み込みの Hello World を実行
+#   crema examples/brainfuck.crema FILE.bf    ファイルを実行
+
+: matching-brackets ( code -- dict )
+  # 対応する [ と ] の位置を辞書にまとめる
+  -> code
+  dict -> jumps
+  { } -> open
+  0 code len 1 - [
+    -> i
+    code i at -> c
+    c "[" = [ open i append drop ] when
+    c "]" = [
+      open empty? [ "unmatched ']' at " i str + error ] when
+      open pop -> j drop
+      jumps i j put j i put drop
+    ] when
+  ] for
+  open empty? not [ "unmatched '['" error ] when
+  jumps ;
+
+: run-bf ( code -- )
+  chars -> code
+  code matching-brackets -> jumps
+  { } -> tape  30000 [ tape 0 append drop ] times
+  0 -> ptr
+  0 -> pc
+  [ pc code len < ] [
+    code pc at -> c
+    c ">" = [ ptr 1 + -> ptr ] when
+    c "<" = [ ptr 1 - -> ptr ] when
+    c "+" = [ tape ptr  tape ptr at 1 + 256 mod  put drop ] when
+    c "-" = [ tape ptr  tape ptr at 1 - 256 mod  put drop ] when
+    c "." = [ tape ptr at chr write ] when
+    c "," = [
+      read-line -> line
+      tape ptr  line nil? [ 0 ] [ line empty? [ 10 ] [ line first ord ] if ] if  put drop
+    ] when
+    c "[" = [ tape ptr at 0 = [ jumps pc at -> pc ] when ] when
+    c "]" = [ tape ptr at 0 != [ jumps pc at -> pc ] when ] when
+    pc 1 + -> pc
+  ] while ;
+
+"++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++."
+args empty? [ ] [ drop args first read-file ] if
+run-bf

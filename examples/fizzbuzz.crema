@@ -1,0 +1,10 @@
+# FizzBuzz: ループと条件分岐
+
+: fizzbuzz ( n -- str )
+  -> n
+  n 15 mod 0 = [ "FizzBuzz" return ] when
+  n 3 mod 0 = [ "Fizz" return ] when
+  n 5 mod 0 = [ "Buzz" return ] when
+  n ;
+
+1 30 [ fizzbuzz print ] for
